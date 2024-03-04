@@ -17,6 +17,7 @@ def room(request, slug):
     messages = Message.objects.filter(room=room)[0:25]
 
     for message in messages:
-        pass
+        from crypto import chacha20
+        message.content = chacha20.decrypt(key=room.get_key(), cipher_message=message.content, nonce=message.get_nonce())
 
     return render(request, 'room/room.html', {'room': room, 'messages': messages})

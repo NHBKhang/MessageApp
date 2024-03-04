@@ -61,4 +61,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = User.objects.get(username=username)
         room = Room.objects.get(slug=room)
 
-        Message.objects.create(user=user, room=room, content=message)
+        from crypto import chacha20
+        nonce = chacha20.generate_nonce()
+        message = chacha20.encrypt(message=message, nonce=nonce, key=room.get_key())
+
+        Message.objects.create(user=user, room=room, content=message, nonce=nonce)

@@ -3,7 +3,18 @@
 {% block title %}Welcome | {% endblock %}
 
 {% block content %}
-<div class="p-10 lg:p-20 text-center">
-    <h1 class="text-3xl lg:text-6xl text-white">Djangochat</h1>
-</div>
+    <div class="p-10 lg:p-20 text-center">
+        <h1 class="text-3xl lg:text-6xl text-white">Djangochat</h1>
+
+        <div class="m-5">
+            <h1 class="text-info" style="font-size: 2em">
+                Welcome to Django room chat,
+                {% if user.first_name %}
+                    {{ user.first_name }}
+                {% else %}
+                    {{ user.username }} !!!
+                {% endif %}
+            </h1>
+        </div>
+    </div>
 {% endblock %}
