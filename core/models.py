@@ -18,8 +18,8 @@ class Gender(enum.Enum):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
-    last_name = models.CharField(max_length=50)
-    phone_number = models.CharField(max_length=15)
-    gender = enum.EnumField(Gender, default=Gender.MALE)
-    date_of_birth = models.DateField()
-    avatar = models.ImageField(upload_to='profile_pics')
+    phone_number = models.CharField(max_length=15, null=True)
+    gender = enum.EnumField(Gender, default=Gender.MALE, null=True)
+    birthday = models.DateField(null=True)
+    address = models.CharField(max_length=128, null=True)
+    avatar = models.ImageField(upload_to='profile_pics', null=True)

@@ -1,6 +1,5 @@
-from django.contrib.auth import login  # xác thực đăng nhập nguười dùng
+from django.contrib.auth import login, get_user
 from django.shortcuts import render, redirect
-
 from .forms import SignUpForm
 
 
@@ -22,3 +21,15 @@ def signup(request):
         form = SignUpForm()
 
     return render(request, 'core/signup.html', {'form': form})
+
+
+def profile(request):
+    from core.models import PublicKey
+
+    try:
+        key = PublicKey.objects.get(user_id=get_user(request).id)
+    except:
+        key = None
+
+    return render(request, 'profile.html',
+                  {'key': key})

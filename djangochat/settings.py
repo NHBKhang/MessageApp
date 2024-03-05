@@ -72,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.utils.context_processors.profile',
             ],
         },
     },
@@ -79,7 +80,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangochat.wsgi.application'
 ASGI_APPLICATION = 'djangochat.asgi.application'
-DB_CHAT_SECRET_KEY = ''
 
 CHANNEL_LAYERS = {
     'default': {
