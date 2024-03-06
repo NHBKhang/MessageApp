@@ -32,13 +32,12 @@
                     </div>
                     <hr class="my-6 border-t border-gray-300">
                     <div class="flex flex-col">
-                        <span class="text-gray-700 uppercase font-bold tracking-wider mb-2">Skills</span>
-                        <ul>
-                            <li class="mb-2">JavaScript</li>
-                            <li class="mb-2">React</li>
-                            <li class="mb-2">HTML/CSS</li>
-                            <li class="mb-2">Tailwind Css</li>
-                        </ul>
+                        <span class="text-gray-700 uppercase font-bold tracking-wider mb-2">Description</span>
+                        <span>
+                            {% if profile.description %}
+                                {{ profile.description }}
+                            {% endif %}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -106,8 +105,8 @@
                         <div class="flex justify-between flex-wrap m-4">
                             <span class="text-gray-700 font-bold">Date of birth</span>
                             <span class="text-gray-700 me-2">
-                                {% if profile.birthday|date:"Y-m-d" %}
-                                    {{ profile.birthday|date:"Y-m-d" }}
+                                {% if profile.birthday %}
+                                    {{ profile.birthday|date:"d-M-y" }}
                                 {% else %}
                                     ---
                                 {% endif %}

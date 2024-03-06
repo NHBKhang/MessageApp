@@ -20,6 +20,9 @@ class Room(models.Model):
     def get_key(self):
         return chacha20.base64_to_bytes(self.key)
 
+    def __str__(self):
+        return self.name
+
 
 class Message(models.Model):
     room = models.ForeignKey(Room, related_name='messages', on_delete=models.CASCADE)
@@ -38,3 +41,6 @@ class Message(models.Model):
 
     class Meta:
         ordering = ('date_added',)
+
+    def __str__(self):
+        return self.name

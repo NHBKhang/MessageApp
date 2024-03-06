@@ -20,6 +20,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=15, null=True)
     gender = enum.EnumField(Gender, default=Gender.MALE, null=True)
-    birthday = models.DateField(null=True)
+    birthday = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=128, null=True)
     avatar = models.ImageField(upload_to='profile_pics', null=True)
+    description = models.TextField(null=True, blank=True)

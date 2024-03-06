@@ -3,19 +3,52 @@
 {% block title %}Rooms | {% endblock %}
 
 {% block content %}
-<div class="p-10 lg:p-20 text-center">
-    <h1 class="text-3xl lg:text-6xl text-white">Rooms</h1>
-</div>
+    <div class="p-10 lg:p-20 text-center">
+        <h1 class="text-3xl lg:text-6xl text-white">Rooms</h1>
+    </div>
 
-<div class="w-full flex flex-wrap items-center">
-    {% for room in rooms %}
+    <div class="w-full flex flex-wrap items-center">
+        {% for room in rooms %}
+            <div class="w-full lg:w-1/4 px-3 py-3">
+                <div class="p-4 bg-white shadow rounded-xl text-center">
+                    <h2 class="mb-5 text-2xl font-semibold">{{ room.name }}</h2>
+
+                    <a href="{% url 'room' room.slug %}"
+                       class="px-5 py-3 block rounded-xl text-white bg-teal-600 hover:bg-teal-700">Join</a>
+                </div>
+            </div>
+        {% endfor %}
+
         <div class="w-full lg:w-1/4 px-3 py-3">
-            <div class="p-4 bg-white shadow rounded-xl text-center">
-                <h2 class="mb-5 text-2xl font-semibold">{{ room.name }}</h2>
+            <div class="p-4 bg-white shadow rounded-xl text-center grid justify-center">
+                <form method="post" action="room/create_room/" onsubmit="return validateForm();">
+                    {% csrf_token %}
 
-                <a href="{% url 'room' room.slug %}" class="px-5 py-3 block rounded-xl text-white bg-teal-600 hover:bg-teal-700">Join</a>
+                    <div class="w-full">
+                        <input type="text" name="name" id="new_name"
+                               class="mb-5 text-2xl w-5/6 font-semibold text-center appearance-none border rounded"
+                               placeholder="New room"/>
+                    </div>
+                    <button class="pb-2 px-20 text-4xl rounded-xl text-white bg-teal-600 hover:bg-teal-700"
+                            onclick=""
+                            type="submit" title="create new room">+
+                    </button>
+
+                </form>
             </div>
         </div>
-    {% endfor %}
-</div>
+
+    </div>
+
+    <script>
+        function validateForm() {
+            var name = document.getElementById('new_name').value.trim();
+            if (name === '') {
+                alert('Name cannot be empty!');
+                return false; // Ngăn form gửi đi nếu trường name rỗng
+            }
+            return true; // Cho phép form gửi đi nếu trường name có giá trị
+        }
+    </script>
+
 {% endblock %}

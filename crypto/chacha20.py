@@ -21,7 +21,7 @@ class ChaCha20:
 
     def generate_key(self):
         random_bytes = secrets.token_bytes(32)
-        return self.__bytes_to_base64(random_bytes)
+        return self.bytes_to_base64(random_bytes)
 
     def generate_nonce(self):
         random_bytes = secrets.token_bytes(16)
