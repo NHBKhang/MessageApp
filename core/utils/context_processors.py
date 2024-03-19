@@ -17,3 +17,14 @@ def profile(request):
         return {'profile': p}
     else:
         return {'profile': None}
+
+
+def public_key(request):
+    from core.models import PublicKey
+
+    try:
+        key = PublicKey.objects.get(user=request.user)
+    except:
+        key = None
+
+    return {'public_key': key}

@@ -32,12 +32,12 @@
 
     <div class="lg:w-3/4 mt-6 mx-4 lg:mx-auto p-4 bg-white rounded-xl">
         <form method="post" action="." class="flex">
+            {% csrf_token %}
+
             <input type="text" name="content" class="flex-1 mr-3" placeholder="Your message..." id="chat-message-input">
 
-            <button
-                    class="px-5 py-3 rounded-xl text-white bg-teal-600 hover:bg-teal-700"
-                    id="chat-message-submit"
-            >Submit
+            <button class="px-5 py-3 rounded-xl text-white bg-teal-600 hover:bg-teal-700"
+                    id="chat-message-submit">Submit
             </button>
         </form>
     </div>
@@ -95,6 +95,7 @@
 
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
+            var key = "{{ public_key }}" === null? "{{ key }}" : "";
 
             console.log({
                 'message': message,
@@ -105,7 +106,8 @@
             chatSocket.send(JSON.stringify({
                 'message': message,
                 'username': userName,
-                'room': roomName
+                'room': roomName,
+                'public_key': key
             }));
 
             messageInputDom.value = '';

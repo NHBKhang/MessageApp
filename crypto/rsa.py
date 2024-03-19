@@ -1,7 +1,9 @@
 from cryptography.hazmat.primitives import serialization
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
+import os
+from crypto import secret_path
 
 
 class RSA:
@@ -14,6 +16,7 @@ class RSA:
             key_size=2048
         )
         public_key = private_key.public_key()
+
         return public_key, private_key
 
     def encrypt(self, message, public_key):
@@ -45,3 +48,80 @@ class RSA:
         )
         decrypted_message = decrypted_bytes.decode('utf-8')
         return decrypted_message
+
+    def save_private_key(self, username, key):
+        # Export the private key to PEM format
+        private_key_pem = key.private_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
+            encryption_algorithm=serialization.NoEncryption()
+        )
+
+        # Convert the PEM formatted key to string
+        private_key = private_key_pem.decode('utf-8')
+
+        import configparser
+
+        # Tạo một đối tượng ConfigParser
+        config = configparser.ConfigParser()
+
+        # Thêm một section mới vào file .ini
+        config.add_section('PRIVATE_KEY')
+        # Thêm các khóa và giá trị tương ứng
+        config.set('PRIVATE_KEY', 'SECRET_KEY', private_key)
+        # config.set('PRIVATE_KEYS', 'DATABASE_PASSWORD', 'your_database_password')
+
+        if not os.path.exists(secret_path):
+            os.makedirs(secret_path)
+
+        with open(secret_path + username + '_config.ini', 'w') as configfile:
+            config.write(configfile)
+
+        return secret_path + username + '_config.ini'
+
+    def read_private_key(self, username):
+        import configparser
+
+        # Đường dẫn đến file .ini
+        path = secret_path + username + '_config.ini'
+        # Tạo một đối tượng ConfigParser
+        config = configparser.ConfigParser()
+
+        # Đọc file .ini
+        config.read(path)
+
+        key = config.get('PRIVATE_KEY', 'SECRET_KEY')
+
+        # Chuyển chuỗi về lại dạng bytes
+        private_key_pem = key.encode('utf-8')
+
+        # Tải private key từ PEM format
+        private_key = serialization.load_pem_private_key(
+            private_key_pem,
+            password=None,  # If the private key is not password-protected
+            backend=default_backend()
+        )
+
+        return private_key
+
+    def public_key_to_string(self, public_key):
+        public_key_pem = public_key.public_bytes(
+            encoding=serialization.Encoding.PEM,
+            format=serialization.PublicFormat.SubjectPublicKeyInfo
+        )
+
+        # Chuyển đổi PEM formatted public key thành chuỗi
+        public_key_string = public_key_pem.decode('utf-8')
+
+        return public_key_string
+
+    def string_to_public_key(self, public_key_string):
+        public_key_bytes = public_key_string.encode('utf-8')
+
+        # Tải khóa công khai từ PEM format
+        public_key = serialization.load_pem_public_key(
+            public_key_bytes,
+            backend=default_backend()
+        )
+
+        return public_key

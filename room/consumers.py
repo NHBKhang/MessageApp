@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
 from .models import Room, Message
+from crypto import rsa
 
 
 class ChatConsumer(AsyncWebsocketConsumer):
@@ -31,16 +32,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data['message']
         username = data['username']
         room = data['room']
+        key = data['public_key']
 
         if message != '':
             await self.save_message(username, room, message)
+
+        #encrypt message using user public key
+        if key != '':
+            pass
 
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': message,
+                'message': rsa.encrypt(message, rsa.string_to_public_key(key)),
                 'username': username
             }
         )
@@ -52,7 +58,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': message,
+            'message': rsa.decrypt(message, rsa.read_private_key(username)),
             'username': username
         }))
 

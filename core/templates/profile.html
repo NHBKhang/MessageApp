@@ -125,16 +125,36 @@
                         </div>
 
                         <div class="flex justify-between flex-wrap m-4">
-                            <span class="text-gray-700 font-bold">Security Key</span>
-                            <span class="text-gray-700 me-2">
-                                {% if key %}
-                                    {{ key.key }}
+                            <span class="text-gray-700 font-bold mb-2">Security Key</span>
+                            <span class="text-gray-700
+                                {% if public_key.key %}me-2">
+                                    {% with public_key.key|cut:"-----"|slice:"17:415" as k %}
+                                        {{ k }}
+                                    {% endwith %}
                                 {% else %}
-                                    ---
+                                    ">---
                                 {% endif %}
                             </span>
                         </div>
                     </div>
+
+                    <div class="bg-indigo-600 rounded-xl flex justify-center">
+                        <div class="justify-start text-white px-3 py-2 pe-4 bg-blue-600 rounded-xl group relative cursor-pointer">
+                            <div class="menu-hover">
+                                <i class="fa-solid fa-exclamation"></i>
+                            </div>
+                            <div class="invisible absolute text-gray-700 z-50 bg-gray-100 py-1 px-4 shadow-xl group-hover:visible"
+                                 style="width: 1000%">
+                                Generate security key use for sending messages. If you already have a key, it generate
+                                new key. This key can be shared to everyone.
+                            </div>
+                        </div>
+                        <a href="/create_key/"
+                           class="w-full text-white flex justify-center hover:text-gray-200 px-3 py-2">
+                            Generate security key
+                        </a>
+                    </div>
+
 
                     <h3 class="font-semibold text-center mt-3 -mb-2">
                         Find me on
