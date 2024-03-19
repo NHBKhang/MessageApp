@@ -77,18 +77,27 @@ class RSA:
         with open(secret_path + username + '_config.ini', 'w') as configfile:
             config.write(configfile)
 
+        from crypto.aes import AESCipher
+        aes = AESCipher()
+        aes.encrypt_file(secret_path + username + '_config.ini')
+
         return secret_path + username + '_config.ini'
 
     def read_private_key(self, username):
         import configparser
+        from crypto.aes import AESCipher
 
         # Đường dẫn đến file .ini
-        path = secret_path + username + '_config.ini'
+        path = secret_path + username + '_config.ini.enc'
+
+        aes = AESCipher()
+        decrypted_data = aes.read_encrypted_file(path)
+
         # Tạo một đối tượng ConfigParser
         config = configparser.ConfigParser()
 
         # Đọc file .ini
-        config.read(path)
+        config.read_string(decrypted_data)
 
         key = config.get('PRIVATE_KEY', 'SECRET_KEY')
 

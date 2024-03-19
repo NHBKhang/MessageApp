@@ -95,7 +95,6 @@
 
             const messageInputDom = document.querySelector('#chat-message-input');
             const message = messageInputDom.value;
-            var key = "{{ public_key }}" === null? "{{ key }}" : "";
 
             console.log({
                 'message': message,
@@ -107,7 +106,7 @@
                 'message': message,
                 'username': userName,
                 'room': roomName,
-                'public_key': key
+                'user_id': {{ user.id }}
             }));
 
             messageInputDom.value = '';

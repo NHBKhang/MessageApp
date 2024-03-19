@@ -32,21 +32,26 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data['message']
         username = data['username']
         room = data['room']
-        key = data['public_key']
 
         if message != '':
             await self.save_message(username, room, message)
 
-        #encrypt message using user public key
+        from core.models import PublicKey
+        get_public_key = sync_to_async(PublicKey.objects.get)
+
+        # Gọi hàm trong ngữ cảnh bất đồng bộ
+        key = await get_public_key(user_id=10)
+
         if key != '':
-            pass
+            # encrypt message using user public key
+            message = rsa.encrypt(message, rsa.string_to_public_key(key.key))
 
         # Send message to room group
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 'type': 'chat_message',
-                'message': rsa.encrypt(message, rsa.string_to_public_key(key)),
+                'message': message,
                 'username': username
             }
         )
@@ -56,9 +61,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event['message']
         username = event['username']
 
+        private_key = rsa.read_private_key(username)
+        if private_key:
+            message = rsa.decrypt(message, private_key)
+
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
-            'message': rsa.decrypt(message, rsa.read_private_key(username)),
+            'message': message,
             'username': username
         }))
 

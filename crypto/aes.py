@@ -1,44 +1,69 @@
-from Crypto.Cipher import AES
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 
 
 class AESCipher:
-    def encrypt_file(self, key, in_filename, out_filename=None, chunksize=64 * 1024):
-        if not out_filename:
-            out_filename = in_filename + '.enc'
+    def encrypt_file(self, input_file, output_file=None, password="123456"):
+        # Đọc dữ liệu từ tệp đầu vào
+        with open(input_file, 'rb') as f:
+            data = f.read()
 
+        # Tạo khóa từ mật khẩu sử dụng PBKDF2
+        salt = os.urandom(16)
+        kdf = PBKDF2HMAC(
+            algorithm=hashes.SHA256(),
+            length=32,
+            salt=salt,
+            iterations=100000,
+            backend=default_backend()
+        )
+        key = kdf.derive(password.encode())
+
+        # Tạo vectơ khởi đầu ngẫu nhiên
         iv = os.urandom(16)
-        encryptor = AES.new(key, AES.MODE_CBC, iv)
 
-        filesize = os.path.getsize(in_filename)
+        # Mã hóa dữ liệu
+        cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+        encryptor = cipher.encryptor()
+        encrypted_data = encryptor.update(data) + encryptor.finalize()
 
-        with open(in_filename, 'rb') as infile:
-            with open(out_filename, 'wb') as outfile:
-                outfile.write(filesize.to_bytes(8, 'big'))
-                outfile.write(iv)
-                while True:
-                    chunk = infile.read(chunksize)
-                    if len(chunk) == 0:
-                        break
-                    elif len(chunk) % 16 != 0:
-                        chunk += b' ' * (16 - len(chunk) % 16)
+        # Ghi dữ liệu đã mã hóa vào tệp đầu ra
+        if output_file is None:
+            output_file = input_file + '.enc'
+        with open(output_file, 'wb') as f:
+            f.write(salt)
+            f.write(iv)
+            f.write(encrypted_data)
 
-                    outfile.write(encryptor.encrypt(chunk))
+        # Xóa tệp gốc
+        os.remove(input_file)
 
-    def decrypt_file(self, key, in_filename, out_filename=None, chunksize=24 * 1024):
-        if not out_filename:
-            out_filename = os.path.splitext(in_filename)[0]
+    def read_encrypted_file(self, input_file, password="123456"):
+        # Đọc dữ liệu từ tệp mã hóa
+        with open(input_file, 'rb') as f:
+            # Đọc salt và vectơ khởi đầu
+            salt = f.read(16)
+            iv = f.read(16)
 
-        with open(in_filename, 'rb') as infile:
-            original_size = int.from_bytes(infile.read(8), 'big')
-            iv = infile.read(16)
-            decryptor = AES.new(key, AES.MODE_CBC, iv)
+            # Tạo khóa từ mật khẩu sử dụng PBKDF2
+            kdf = PBKDF2HMAC(
+                algorithm=hashes.SHA256(),
+                length=32,
+                salt=salt,
+                iterations=100000,
+                backend=default_backend()
+            )
+            key = kdf.derive(password.encode())
 
-            with open(out_filename, 'wb') as outfile:
-                while True:
-                    chunk = infile.read(chunksize)
-                    if len(chunk) == 0:
-                        break
-                    outfile.write(decryptor.decrypt(chunk))
+            # Khởi tạo giải mã
+            cipher = Cipher(algorithms.AES(key), modes.CFB(iv), backend=default_backend())
+            decryptor = cipher.decryptor()
 
-                outfile.truncate(original_size)
+            # Đọc và giải mã dữ liệu từ tệp
+            decrypted_data = decryptor.update(f.read()) + decryptor.finalize()
+
+        return decrypted_data.decode('utf-8')
