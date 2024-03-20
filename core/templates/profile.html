@@ -126,14 +126,17 @@
 
                         <div class="flex justify-between flex-wrap m-4">
                             <span class="text-gray-700 font-bold mb-2">Security Key</span>
+                            {% if public_key %}
+                                <span class="me-2 rounded-xl bg-gray-100 px-2 py-1"><button onclick="copy()"><i class="fa-solid fa-copy"></i></button></span>
+                            {% endif %}
                             <span class="text-gray-700
-                                {% if public_key.key %}me-2">
-                                    {% with public_key.key|cut:"-----"|slice:"17:415" as k %}
-                                        {{ k }}
-                                    {% endwith %}
-                                {% else %}
-                                    ">---
-                                {% endif %}
+                            {% if public_key.key %}w-full h-auto truncate" id="key">
+                                {% with public_key.key|cut:"-----"|slice:"17:415" as k %}
+                                    {{ k }}
+                                {% endwith %}
+                            {% else %}
+                                me-2">---
+                            {% endif %}
                             </span>
                         </div>
                     </div>
@@ -212,6 +215,7 @@
     </div>
 
     <link rel="stylesheet" type="text/css" href="../static/css/profile.css">
+    <script src="../static/js/profile.js"></script>
 
 {% endblock %}
 </html>

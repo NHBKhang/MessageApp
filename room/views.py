@@ -30,3 +30,13 @@ def create_room(request):
             room = Room.objects.create(name=name)
 
             return redirect('room', slug=room.slug)
+
+
+@login_required
+def delete_room(request):
+    if request.method == 'POST':
+        id = request.POST.get('id')
+        if id:
+            Room.objects.get(pk=int(id)).delete()
+
+    return redirect('rooms')

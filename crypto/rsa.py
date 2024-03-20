@@ -89,6 +89,8 @@ class RSA:
 
         # Đường dẫn đến file .ini
         path = secret_path + username + '_config.ini.enc'
+        if not os.path.exists(path):
+            return None
 
         aes = AESCipher()
         decrypted_data = aes.read_encrypted_file(path)

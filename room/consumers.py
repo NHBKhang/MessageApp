@@ -40,9 +40,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         get_public_key = sync_to_async(PublicKey.objects.get)
 
         # Gọi hàm trong ngữ cảnh bất đồng bộ
-        key = await get_public_key(user_id=10)
+        try:
+            key = await get_public_key(user_id=int(data['user_id']))
+        except:
+            key = None
 
-        if key != '':
+        if key:
             # encrypt message using user public key
             message = rsa.encrypt(message, rsa.string_to_public_key(key.key))
 

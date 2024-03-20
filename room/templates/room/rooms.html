@@ -10,8 +10,16 @@
     <div class="w-full flex flex-wrap items-center">
         {% for room in rooms %}
             <div class="w-full lg:w-1/4 px-3 py-3">
-                <div class="p-4 bg-white shadow rounded-xl text-center">
+                <div class="p-4 bg-white shadow rounded-xl text-center relative">
                     <h2 class="mb-5 text-2xl font-semibold">{{ room.name }}</h2>
+
+                    <form action="room/delete_room/" method="post" class="absolute top-2 right-2"
+                          onsubmit="return deleteForm('{{ room.name }}');">
+                        {% csrf_token %}
+
+                        <button type="submit" value="{{ room.id }}" id="id" name="id"><i class="fa-solid fa-trash"></i>
+                        </button>
+                    </form>
 
                     <a href="{% url 'room' room.slug %}"
                        class="px-5 py-3 block rounded-xl text-white bg-teal-600 hover:bg-teal-700">Join</a>
@@ -30,7 +38,6 @@
                                placeholder="New room"/>
                     </div>
                     <button class="pb-2 px-20 text-4xl rounded-xl text-white bg-teal-600 hover:bg-teal-700"
-                            onclick=""
                             type="submit" title="create new room">+
                     </button>
 
@@ -48,6 +55,10 @@
                 return false; // Ngăn form gửi đi nếu trường name rỗng
             }
             return true; // Cho phép form gửi đi nếu trường name có giá trị
+        }
+
+        function deleteForm(name) {
+            return confirm('Bạn có muốn xóa phòng ' + name + ' không?')
         }
     </script>
 
