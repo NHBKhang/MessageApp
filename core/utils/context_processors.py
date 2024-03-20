@@ -1,4 +1,4 @@
-from core.models import Profile
+from core.models import Profile, Notification, PublicKey
 from django.contrib.auth import get_user
 from django.db import connection
 
@@ -20,11 +20,32 @@ def profile(request):
 
 
 def public_key(request):
-    from core.models import PublicKey
-
     try:
         key = PublicKey.objects.get(user=request.user)
     except:
         key = None
 
     return {'public_key': key}
+
+
+def notifications(request):
+    from crypto.errors import rsa_keys_check, error_message
+
+    error = None
+    try:
+        notifications = Notification.objects.filter(user=request.user).order_by('-date_added')
+        error = rsa_keys_check(request.user)
+    except:
+        notifications = None
+    print(error)
+    if error:
+        note = notifications.filter(type=error).filter(is_read=False)
+        if not note:
+            content, description = error_message(error)
+            Notification.objects.create(content=content, user=request.user, type=error, description=description)
+
+    if notifications:
+        return {'notifications': notifications.all(),
+                'unread_count': notifications.filter(is_read=False).count()}
+    else:
+        return {}

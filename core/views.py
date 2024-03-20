@@ -29,7 +29,7 @@ def profile(request):
 
 def create_key(request):
     from crypto import rsa
-    from core.models import PublicKey
+    from core.models import PublicKey, Notification
 
     public_key, private_key = rsa.generate_keypair()
 
@@ -43,4 +43,23 @@ def create_key(request):
     else:
         PublicKey.objects.create(key=rsa.public_key_to_string(public_key), user=request.user)
 
+    #key error fixed
+    note = Notification.objects.filter(user=request.user).filter(is_read=False).all()
+    if note:
+        for n in note:
+            n.is_read=True
+            n.save()
+
     return redirect('profile')
+
+
+def delete_notification(request, id):
+    if request.method == 'POST':
+        from core.models import Notification
+
+        n = Notification.objects.get(pk=id)
+        if n:
+            n.delete()
+
+        return redirect(request.META['HTTP_REFERER'])
+

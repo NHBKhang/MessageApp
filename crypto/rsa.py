@@ -4,6 +4,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
 import os
 from crypto import secret_path
+from djangochat import settings
 
 
 class RSA:
@@ -67,6 +68,7 @@ class RSA:
 
         # Thêm một section mới vào file .ini
         config.add_section('PRIVATE_KEY')
+
         # Thêm các khóa và giá trị tương ứng
         config.set('PRIVATE_KEY', 'SECRET_KEY', private_key)
         # config.set('PRIVATE_KEYS', 'DATABASE_PASSWORD', 'your_database_password')
@@ -79,7 +81,7 @@ class RSA:
 
         from crypto.aes import AESCipher
         aes = AESCipher()
-        aes.encrypt_file(secret_path + username + '_config.ini')
+        aes.encrypt_file(secret_path + username + '_config.ini', password=settings.FILE_SECRET_KEY)
 
         return secret_path + username + '_config.ini'
 
@@ -93,7 +95,7 @@ class RSA:
             return None
 
         aes = AESCipher()
-        decrypted_data = aes.read_encrypted_file(path)
+        decrypted_data = aes.read_encrypted_file(path, password=settings.FILE_SECRET_KEY)
 
         # Tạo một đối tượng ConfigParser
         config = configparser.ConfigParser()

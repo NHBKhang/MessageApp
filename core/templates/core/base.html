@@ -10,6 +10,12 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet"/>
+
+    <link href="../../static/css/style.css" rel="stylesheet" type="text/css">
+
     <style>
         .messages {
             height: 400px;
@@ -36,14 +42,63 @@
         {% if request.user.is_authenticated %}
             <a href="/rooms/" class="text-white hover:text-gray-200 px-3 py-2 rounded-xl bg-indigo-600">Rooms</a>
 
-            <a href="/profile/">
-                <img src="
+            <div class="relative">
+                <a href="/profile/">
+                    <img src="
                         {% if profile.avatar %}
                             {{ profile.avatar }}
                         {% else %}
                             https://cdn-icons-png.flaticon.com/512/3541/3541871.png
                         {% endif %}" alt="avatar" class="rounded-full p-0" width="50">
-            </a>
+                </a>
+
+                <button class="rounded-full bg-white absolute top-8 right-8" data-dropdown-toggle="dropdown">
+                    <i class="fa-solid fa-bell" style="padding: 5px 6px"></i>
+                    <span style="font-weight: bolder; top: 37%; right: 70%; font-size: 1.05em"
+                          class="text-red-500 absolute cursor-pointer">{{ unread_count }}</span>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div id="dropdown" style="height: 566%; width: 720%; border: 1px solid black"
+                     class="z-10 hidden divide-y bg-white divide-gray-100 rounded-xl shadow w-44 dark:bg-gray-700">
+                    {% if notifications %}
+                        <ul class="overflow-auto h-full">
+                            {% for n in notifications %}
+                                <li style="background:
+                                        {% if n.is_read %}
+                                            whitesmoke
+                                        {% else %}
+                                            gold
+                                        {% endif %}; border: solid grey; border-width: 0 0 1px 0"
+                                    class="px-2 py-1 text-sm text-gray-700 dark:text-gray-200 relative">
+
+                                    <span class="block" style="font-weight: bold">{{ n.content }}</span>
+                                    <small class="p-0 m-0">{{ n.description }}</small>
+                                    <div class="flex justify-between">
+                                        <small class="inline text-green-500">{% if n.is_read %}Solved{% endif %}</small>
+                                        <small class="inline">{{ n.date_added }}</small>
+                                    </div>
+                                    {% if n.is_read %}
+                                        <form method="post" action="/notification/delete/{{ n.id }}"
+                                              class="top-1 right-1 absolute">
+                                            {% csrf_token %}
+
+                                            <button class="px-2 pb-1 pt-0 rounded-full"
+                                                    style="border: 1px solid red; color: red"
+                                                    type="submit">x
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <span class="flex justify-center items-center py-2 text-sm text-gray-700 dark:text-gray-200">Không có thông báo nào!!!</span>
+                    {% endif %}
+                </div>
+
+            </div>
+
             <form method="post" action="/logout/"
                   class="px-3 py-2 rounded-xl text-white bg-teal-600 hover:bg-teal-700">
                 {% csrf_token %}

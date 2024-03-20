@@ -73,7 +73,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'core.utils.context_processors.profile',
-                'core.utils.context_processors.public_key'
+                'core.utils.context_processors.public_key',
+                'core.utils.context_processors.notifications'
             ],
         },
     },
@@ -82,7 +83,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'djangochat.wsgi.application'
 ASGI_APPLICATION = 'djangochat.asgi.application'
 
-FILE_SECRET_KEY = b'@Gc0f2d;m$%?1W#5'
+FILE_SECRET_KEY = '@Gc0f2d;m$%?1W#5#$TYVfge2wg2!@+;0,<Bdsvb'
 
 CHANNEL_LAYERS = {
     'default': {

@@ -9,6 +9,9 @@ class PublicKey(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Gender(enum.Enum):
     MALE = 1
@@ -23,4 +26,21 @@ class Profile(models.Model):
     birthday = models.DateField(null=True, blank=True)
     address = models.CharField(max_length=128, null=True)
     avatar = models.ImageField(upload_to='profile_pics', null=True)
+    description = models.TextField(null=True, blank=True)
+
+
+class NotificationType(enum.Enum):
+    Error = 0
+    KeypairError = 1
+    NoKeypairError = 2
+    PrivateKeyError = 3
+    PublicKeyError = 4
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, related_name='notification', on_delete=models.CASCADE)
+    content = models.TextField(null=False, blank=False)
+    date_added = models.DateTimeField(auto_now_add=True)
+    type = enum.EnumField(NotificationType, default=NotificationType.Error)
+    is_read = models.BooleanField(default=False)
     description = models.TextField(null=True, blank=True)
