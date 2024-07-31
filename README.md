@@ -8,3 +8,5 @@
       
 * Account (username/ password):
     - admin / 123456 (admin)
+ 
+* Phiên bản cũ: https://github.com/dochihung2909/ATTT_ChatServer/tree/new
